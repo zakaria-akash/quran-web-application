@@ -1,0 +1,37 @@
+[
+  {
+    "surahId": 1,
+    "ayahNumber": 1,
+    "arabicText": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ"
+  },
+  {
+    "surahId": 1,
+    "ayahNumber": 2,
+    "arabicText": "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ"
+  },
+  {
+    "surahId": 1,
+    "ayahNumber": 3,
+    "arabicText": "الرَّحْمَٰنِ الرَّحِيمِ"
+  },
+  {
+    "surahId": 1,
+    "ayahNumber": 4,
+    "arabicText": "مَالِكِ يَوْمِ الدِّينِ"
+  },
+  {
+    "surahId": 1,
+    "ayahNumber": 5,
+    "arabicText": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ"
+  },
+  {
+    "surahId": 1,
+    "ayahNumber": 6,
+    "arabicText": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ"
+  },
+  {
+    "surahId": 1,
+    "ayahNumber": 7,
+    "arabicText": "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ"
+  }
+]

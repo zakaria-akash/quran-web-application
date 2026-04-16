@@ -2,8 +2,8 @@
 
 ## Phase Progress Tracker
 
-- Phase 0: Completed (see `Phase0.md`)
-- Phase 1: Not started
+- Phase 0: Completed
+- Phase 1: Completed
 - Phase 2: Not started
 - Phase 3: Not started
 - Phase 4: Not started
@@ -70,13 +70,143 @@ Note on structure:
 - No unresolved feature/scope questions remain.
 - Team can begin implementation without architecture ambiguity.
 
+### Phase 0 Implementation Record
+
+#### Scope Lock (MVP Features)
+
+1. Surah List Page
+
+- Route: `src/app/page.js`
+- Must list all 114 surahs
+- Must show surah number, Arabic name, and English name
+
+1. Surah Detail (Ayat) Page
+
+- Route: `src/app/surah/[id]/page.js`
+- Must render ayat for selected surah
+- Must show Arabic ayah text and English translation
+
+1. Search Page
+
+- Route: `src/app/search/page.js`
+- Must support search by English translation text
+- Must return ayah matches with surah reference
+
+1. Settings Page
+
+- Route: `src/app/settings/page.js`
+- Must allow Arabic font family switch (minimum 2 fonts)
+- Must allow Arabic font size adjustment
+- Must allow translation font size adjustment
+- Must persist settings in localStorage
+
+#### Non-Goals (Out of Scope)
+
+- Audio recitation
+- Tafsir
+- Authentication or user accounts
+- Database integration
+- Multi-translation support
+
+#### Agreed Route and Folder Map
+
+App routes (UI):
+
+- `src/app/layout.js` (global layout)
+- `src/app/page.js` (surah list)
+- `src/app/surah/[id]/page.js` (surah ayat page)
+- `src/app/search/page.js` (search UI)
+- `src/app/settings/page.js` (settings UI)
+
+API routes (minimal backend):
+
+- `src/app/api/quran/route.js` (GET all surahs)
+- `src/app/api/quran/[id]/route.js` (GET ayat by surah id)
+- `src/app/api/search/route.js` (POST search query)
+
+Shared utilities:
+
+- `src/lib/quran.js` (quran data loading and normalization)
+- `src/lib/settings.js` (localStorage settings read/write/validation)
+
+Data directory:
+
+- `public/quran-json/` (all static Quran JSON files)
+
+#### Dataset Contract (Required Data Shape)
+
+Surah list contract:
+
+- Source: `public/quran-json/surah.json`
+- Required fields: `id` (number), `nameArabic` (string), `nameEnglish` (string)
+- Optional fields: `revelationType` (string), `totalAyah` (number)
+
+Ayat contract:
+
+- Source: `public/quran-json/ayat.json` or equivalent split model
+- Required fields: `surahId` (number), `ayahNumber` (number), `arabicText` (string)
+
+Translation contract:
+
+- Source: `public/quran-json/translation.json`
+- Required fields: `surahId` (number), `ayahNumber` (number), `text` (string)
+
+Join rules:
+
+- Join ayah and translation by (`surahId`, `ayahNumber`)
+- Surah references must use numeric IDs
+- Incomplete records are skipped safely and must never crash rendering
+
+#### API Contract Baseline
+
+GET `/api/quran`:
+
+- Success: `200`
+- Error: `500` with `{ error: string }`
+
+GET `/api/quran/[id]`:
+
+- Success: `200`
+- Invalid surah id: `400`
+- Not found: `404`
+- Error: `500` with `{ error: string }`
+
+POST `/api/search`:
+
+- Request body: `{ query: string }`
+- Empty query: `400`
+- Success: `200` with `{ results: [] }`
+- Error: `500` with `{ error: string }`
+
+#### Quality Baseline
+
+- Responsive layout for mobile and desktop
+- Basic accessibility: semantic structure, contrast, keyboard focus visibility
+- Performance baseline: avoid repeated dataset parsing and keep responses predictable
+
+#### Decisions and Exit Check
+
+Decision notes:
+
+- App structure remains under `src/app`
+- Minimal backend uses Next.js API routes under `src/app/api`
+- Data source remains static JSON under `public/quran-json`
+
+Exit check status:
+
+- Finalized scope checklist: Done
+- Agreed route map and folder map: Done
+- Dataset contract documented: Done
+
 ## Phase 1 - Foundation and Data Layer Setup
 
 ### Goals
+
 - Prepare project foundation for fast implementation.
 - Install and verify data availability and utility helpers.
 
 ### Tasks
+
 - Prepare/verify dataset files in `public/quran-json/`:
   - Surah metadata list
   - Ayat data grouped or indexable by surah id
@@ -99,13 +229,88 @@ Note on structure:
 - Verify local development environment and scripts run cleanly.
 
 ### Deliverables
+
 - Stable dataset folder in `public/quran-json/`
 - Reusable helper modules in `src/lib/`
 - Baseline global theme tokens/styles
 
 ### Exit Criteria
+
 - Data can be loaded reliably from helpers.
 - Settings helper API is stable and safe against missing localStorage values.
+
+### Phase 1 Implementation Record
+
+#### Dataset Preparation
+
+Prepared dataset directory:
+
+- `public/quran-json/`
+
+Prepared files:
+
+- `public/quran-json/surah.json`
+- `public/quran-json/ayat.json`
+- `public/quran-json/translation.json`
+- `public/quran-json/README.md`
+
+Implementation note:
+
+- Added a starter dataset (Al-Fatihah) to validate schema flow and data loading
+- Full 114-surah dataset replacement is planned before or during Phase 2
+
+#### Shared Quran Data Helpers
+
+Implemented file:
+
+- `src/lib/quran.js`
+
+Implemented capabilities:
+
+- JSON loading from `public/quran-json/`
+- Validation and normalization for surah, ayah, and translation records
+- In-memory cache for repeated calls
+- Getters for surah list, ayat list, and translation list
+- Filtering by surah id
+- Joined surah content (ayah + translation)
+- Translation text search helper
+- Cache clear helper
+
+#### Shared Settings Helpers
+
+Implemented file:
+
+- `src/lib/settings.js`
+
+Implemented capabilities:
+
+- Default settings object
+- localStorage-safe read/write functions
+- Value sanitization and fallback handling
+- Size bounds and clamping
+- Merge partial settings over defaults
+- Export settings constraints for UI control wiring
+
+#### Base Theme Tokens and Styles
+
+Updated file:
+
+- `src/app/globals.css`
+
+Theme baseline:
+
+- Black token: `#0A0A0A`
+- Navy token: `#0D1B2A`
+- Light text token for readability
+- CSS variable based gradient background
+- Existing home layout behavior preserved
+
+#### Phase 1 Exit Check
+
+- Stable dataset folder in `public/quran-json/`: Done
+- Reusable helper modules in `src/lib/`: Done
+- Baseline global theme tokens/styles: Done
+- Local environment/scripts validation: Done
 
 ## Phase 2 - Core Reading Experience (Surah List + Surah Detail)
 

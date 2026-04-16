@@ -1,19 +1,31 @@
+/* Theme tokens defined in Phase 1 to keep color and typography centralized. */
+:root {
+  --color-black: #0a0a0a;
+  --color-navy: #0d1b2a;
+  --color-text-light: #e0e1dd;
+  --font-ui: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Global reset for predictable box sizing behavior across components. */
 * {
   box-sizing: border-box;
 }
 
+/* Document sizing reset so full-height layouts can rely on viewport fill. */
 html,
 body {
   margin: 0;
   min-height: 100%;
 }
 
+/* Global body styling uses Phase 1 black and navy theme tokens. */
 body {
-  background: linear-gradient(160deg, #000000 0%, #001433 100%);
-  color: #f5f7ff;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(160deg, var(--color-black) 0%, var(--color-navy) 100%);
+    color: var(--color-text-light);
+    font-family: var(--font-ui);
 }
 
+/* Home page container keeps top alignment and centered text with safe padding. */
 .home-page {
   min-height: 100vh;
   padding: 32px;
