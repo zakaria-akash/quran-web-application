@@ -1,5 +1,14 @@
 # Quran Web Application (QWA) - Implementation Workflow
 
+## Phase Progress Tracker
+
+- Phase 0: Completed (see `Phase0.md`)
+- Phase 1: Not started
+- Phase 2: Not started
+- Phase 3: Not started
+- Phase 4: Not started
+- Phase 5: Not started
+
 This workflow defines the full project implementation path for the MVP described in:
 - QWA_Overview.md
 - QWA_FrontendGuide.md
