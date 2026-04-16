@@ -4,7 +4,7 @@
 
 - Phase 0: Completed
 - Phase 1: Completed
-- Phase 2: Not started
+- Phase 2: Completed
 - Phase 3: Not started
 - Phase 4: Not started
 - Phase 5: Not started
@@ -339,6 +339,67 @@ Theme baseline:
 ### Exit Criteria
 - User can navigate from list to any surah detail and read ayat + translation smoothly.
 - Invalid ids are handled without app-breaking errors.
+
+### Phase 2 Implementation Record
+
+#### Implemented Surah List Page
+
+Implemented route:
+
+- `src/app/page.js`
+
+Implemented behavior:
+
+- Loads Surah data via `src/lib/quran.js`
+- Renders Surah number, Arabic name, and English name
+- Links each Surah item to `/surah/[id]`
+- Uses a responsive card layout for mobile and desktop
+
+#### Implemented Surah Detail Page
+
+Implemented route:
+
+- `src/app/surah/[id]/page.js`
+
+Implemented behavior:
+
+- Loads Surah metadata and joined ayat+translation content
+- Renders Surah heading context (English + Arabic + number)
+- Renders each ayah with Arabic text and translation
+- Includes empty-state fallback when ayah content is unavailable
+
+#### SSG and Route Safety
+
+Implemented SSG behavior:
+
+- Uses `generateStaticParams` in `src/app/surah/[id]/page.js`
+- Uses `dynamicParams = false` to allow only generated IDs
+
+Implemented invalid/missing handling:
+
+- Invalid route ids call `notFound()`
+- Unknown Surah ids call `notFound()`
+- Route-specific UI added in `src/app/surah/[id]/not-found.js`
+
+#### Readability and Responsive Styling
+
+Updated styles:
+
+- `src/app/globals.css`
+
+Implemented style outcomes:
+
+- Responsive Surah list grid and card system
+- Structured Surah detail typography for Arabic and English text
+- Accessible hover/focus states for keyboard and pointer users
+- Consistent dark-theme readability with spacing improvements
+
+#### Phase 2 Exit Check
+
+- Functional Surah index page: Done
+- Functional per-surah ayat page: Done
+- Stable static generation approach for content routes: Done
+- Invalid IDs handled safely with not-found UI: Done
 
 ## Phase 3 - Search and Minimal Backend API Routes
 

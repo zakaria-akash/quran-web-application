@@ -21,7 +21,7 @@ body {
 /* Global body styling uses Phase 1 black and navy theme tokens. */
 body {
   background: linear-gradient(160deg, var(--color-black) 0%, var(--color-navy) 100%);
-    color: var(--color-text-light);
+  color: var(--color-text-light);
     font-family: var(--font-ui);
 }
 
@@ -35,4 +35,203 @@ body {
   text-align: center;
   font-size: clamp(1.5rem, 2vw + 1rem, 2.5rem);
   font-weight: 600;
+}
+
+/* This page wrapper provides breathing room around the Surah index content. */
+.surah-list-page {
+  min-height: 100vh;
+  padding: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* The title is intentionally prominent to anchor the reading interface. */
+.surah-list-title {
+  margin: 0;
+  font-size: clamp(1.8rem, 2.2vw + 1rem, 3rem);
+}
+
+/* Supporting copy clarifies the list action and keeps vertical rhythm. */
+.surah-list-subtitle {
+  margin: 10px 0 24px;
+  color: #c6c9d1;
+}
+
+/* Responsive card grid adapts from mobile to desktop without media query complexity. */
+.surah-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+/* Each card is a full-area link with contrast, hover, and focus affordances. */
+.surah-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 16px;
+  color: var(--color-text-light);
+  text-decoration: none;
+  transition: transform 0.18s ease, background-color 0.18s ease;
+}
+
+/* Keyboard users get a clear ring and pointer users get a subtle lift. */
+.surah-card:hover,
+.surah-card:focus-visible {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.11);
+  outline: 2px solid #9fb7ff;
+  outline-offset: 2px;
+}
+
+/* Surah number is styled as a compact badge for quick visual scanning. */
+.surah-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(159, 183, 255, 0.16);
+  font-weight: 700;
+}
+
+/* Arabic name gets larger type size and right-aligned reading direction support. */
+.surah-name-arabic {
+  font-size: 1.45rem;
+  direction: rtl;
+  text-align: right;
+}
+
+/* English label is secondary metadata with softened color. */
+.surah-name-english {
+  color: #d2d6de;
+}
+
+/* Detail page container centers content and ensures readability on all screens. */
+.surah-detail-page {
+  min-height: 100vh;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* Top bar keeps the back link in a stable place across Surah pages. */
+.surah-detail-topbar {
+  margin-bottom: 16px;
+}
+
+/* Shared back link style for detail and not-found views. */
+.back-link {
+  color: #b8c8ff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Focus and hover states keep navigation affordances obvious. */
+.back-link:hover,
+.back-link:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+
+/* Surah header creates a clean visual hierarchy before the ayah list begins. */
+.surah-detail-header {
+  margin-bottom: 20px;
+}
+
+/* English title is the primary heading for the page. */
+.surah-detail-title {
+  margin: 0;
+  font-size: clamp(1.6rem, 1.7vw + 1rem, 2.4rem);
+}
+
+/* Arabic name appears as a co-primary label below the English heading. */
+.surah-detail-arabic-name {
+  margin: 6px 0;
+  font-size: 1.8rem;
+  direction: rtl;
+  text-align: right;
+}
+
+/* Meta line carries low-priority route context information. */
+.surah-detail-meta {
+  margin: 0;
+  color: #c3c8d2;
+}
+
+/* Empty state is framed distinctly to communicate missing content without error tone. */
+.surah-empty-state {
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Ayah list stacks cards in a readable vertical flow. */
+.ayah-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Ayah card isolates each ayah visually for easier reading and scanning. */
+.ayah-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+/* Ayah number uses uppercase spacing to function as compact metadata. */
+.ayah-number {
+  margin: 0 0 10px;
+  color: #b7bfd0;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Arabic ayah text gets stronger emphasis and right alignment for readability. */
+.ayah-arabic-text {
+  margin: 0;
+  direction: rtl;
+  text-align: right;
+  font-size: clamp(1.4rem, 1.1vw + 1.1rem, 2rem);
+  line-height: 1.8;
+}
+
+/* Translation text remains clearly separated with softer visual weight. */
+.ayah-translation-text {
+  margin: 10px 0 0;
+  color: #d5d8df;
+  line-height: 1.6;
+}
+
+/* Not-found page remains centered and simple to reduce recovery friction. */
+.surah-not-found-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 24px;
+}
+
+/* Not-found title is concise and immediately visible. */
+.surah-not-found-title {
+  margin: 0;
+  font-size: clamp(1.6rem, 1.6vw + 1rem, 2.4rem);
+}
+
+/* Not-found support text keeps the reason clear and actionable. */
+.surah-not-found-text {
+  margin: 0;
+  color: #ccd2dc;
+  max-width: 560px;
 }
