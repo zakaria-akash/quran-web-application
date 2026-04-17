@@ -57,6 +57,34 @@ body {
   color: #c6c9d1;
 }
 
+/* Action row groups high-level navigation actions on major pages. */
+.surah-list-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+/* Action links are styled as compact pills to separate them from content cards. */
+.action-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(159, 183, 255, 0.2);
+  border: 1px solid rgba(159, 183, 255, 0.35);
+  color: #dbe6ff;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 14px;
+}
+
+/* Action links get visible hover/focus feedback for accessibility and affordance. */
+.action-link:hover,
+.action-link:focus-visible {
+  background: rgba(159, 183, 255, 0.3);
+  outline: 2px solid #9fb7ff;
+  outline-offset: 2px;
+}
 /* Responsive card grid adapts from mobile to desktop without media query complexity. */
 .surah-grid {
   display: grid;
@@ -121,6 +149,8 @@ body {
 
 /* Top bar keeps the back link in a stable place across Surah pages. */
 .surah-detail-topbar {
+  display: flex;
+    gap: 14px;
   margin-bottom: 16px;
 }
 
@@ -138,6 +168,10 @@ body {
   outline: none;
 }
 
+/* Secondary back links are visually differentiated while keeping shared behavior. */
+.secondary-back-link {
+  color: #d0dcff;
+}
 /* Surah header creates a clean visual hierarchy before the ayah list begins. */
 .surah-detail-header {
   margin-bottom: 20px;
@@ -234,4 +268,123 @@ body {
   margin: 0;
   color: #ccd2dc;
   max-width: 560px;
+}
+/* Search page container uses the same max-width pattern as other major screens. */
+.search-page {
+  min-height: 100vh;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* Search top bar keeps navigation stable across reading and search views. */
+.search-topbar {
+  margin-bottom: 14px;
+}
+
+/* Search header groups title and helper text for quick feature orientation. */
+.search-header {
+  margin-bottom: 20px;
+}
+
+/* Search title is a primary heading with responsive size scaling. */
+.search-title {
+  margin: 0;
+  font-size: clamp(1.6rem, 1.8vw + 1rem, 2.5rem);
+}
+
+/* Subtitle softens contrast while preserving readability on dark backgrounds. */
+.search-subtitle {
+  margin: 8px 0 0;
+  color: #c4cbd8;
+}
+
+/* Input section uses a simple vertical layout for label-input clarity. */
+.search-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+/* Label styling keeps form semantics visible and consistent with page typography. */
+.search-label {
+  font-weight: 600;
+}
+
+/* Input has clear focus visuals and sufficient contrast in the dark theme. */
+.search-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-light);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 11px 12px;
+}
+
+/* Focus ring improves keyboard usability and discoverability of active field. */
+.search-input:focus-visible {
+  outline: 2px solid #9fb7ff;
+  outline-offset: 2px;
+}
+
+/* Status line communicates in-flight asynchronous search state. */
+.search-status {
+  margin: 10px 0 0;
+  color: #cfd7e8;
+}
+
+/* Error line uses warm contrast to distinguish failures from normal states. */
+.search-error {
+  margin: 10px 0 0;
+  color: #ffb8b8;
+}
+
+/* Result region spacing prevents cards from feeling visually cramped. */
+.search-results {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Empty state copy is subtle and not styled as an application error. */
+.search-empty {
+  margin: 0;
+  color: #c2cadd;
+}
+
+/* Result cards mirror existing card language for a consistent product feel. */
+.search-result-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+/* Metadata line provides context before the user reads translation text. */
+.search-result-meta {
+  margin: 0;
+  color: #b8bfd0;
+  font-size: 0.9rem;
+}
+
+/* Translation text is primary content and receives stronger foreground contrast. */
+.search-result-text {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+/* Result link is visually tied to navigation actions and keyboard-friendly. */
+.search-result-link {
+  color: #bbceff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Hover/focus ensures result actions remain clearly interactive. */
+.search-result-link:hover,
+.search-result-link:focus-visible {
+  text-decoration: underline;
+  outline: none;
 }

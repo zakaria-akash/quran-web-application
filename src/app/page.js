@@ -14,6 +14,13 @@ export default async function Home() {
       {/* This supporting text clarifies what content is shown in the list below. */}
       <p className="surah-list-subtitle">Browse Surahs and open any Surah to read its Ayat and translation.</p>
 
+      {/* This action link provides direct access to translation search. */}
+      <div className="surah-list-actions">
+        <Link href="/search" className="action-link">
+          Open Search
+        </Link>
+      </div>
+
       {/* This grid renders one card per surah and links to the dynamic surah route. */}
       <section className="surah-grid" aria-label="Surah list">
         {surahList.map((surah) => (

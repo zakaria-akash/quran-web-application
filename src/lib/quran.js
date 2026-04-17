@@ -19,6 +19,9 @@ const DATA_FILES = {
   translations: "translation.json",
 };
 
+// In development we bypass long-lived cache so dataset file edits are reflected immediately.
+const SHOULD_USE_DATA_CACHE = process.env.NODE_ENV === "production";
+
 // This helper safely converts values to positive integers for ID fields.
 function toPositiveInteger(value) {
   const parsed = Number(value);
@@ -111,7 +114,7 @@ function normalizeArrayRecords(inputArray, normalizer) {
 
 // This function loads, normalizes, and caches the surah list dataset.
 export async function getSurahList() {
-  if (quranDataCache.surahs) {
+  if (SHOULD_USE_DATA_CACHE && quranDataCache.surahs) {
     return quranDataCache.surahs;
   }
 
@@ -120,13 +123,15 @@ export async function getSurahList() {
 
   // Sorting by ID guarantees stable output order even if source order changes.
   normalizedSurahs.sort((a, b) => a.id - b.id);
-  quranDataCache.surahs = normalizedSurahs;
+  if (SHOULD_USE_DATA_CACHE) {
+    quranDataCache.surahs = normalizedSurahs;
+  }
   return normalizedSurahs;
 }
 
 // This function loads, normalizes, and caches the ayat dataset.
 export async function getAyatList() {
-  if (quranDataCache.ayat) {
+  if (SHOULD_USE_DATA_CACHE && quranDataCache.ayat) {
     return quranDataCache.ayat;
   }
 
@@ -135,13 +140,15 @@ export async function getAyatList() {
 
   // Sorting by surah and ayah provides deterministic reading sequence.
   normalizedAyat.sort((a, b) => a.surahId - b.surahId || a.ayahNumber - b.ayahNumber);
-  quranDataCache.ayat = normalizedAyat;
+  if (SHOULD_USE_DATA_CACHE) {
+    quranDataCache.ayat = normalizedAyat;
+  }
   return normalizedAyat;
 }
 
 // This function loads, normalizes, and caches the translation dataset.
 export async function getTranslationList() {
-  if (quranDataCache.translations) {
+  if (SHOULD_USE_DATA_CACHE && quranDataCache.translations) {
     return quranDataCache.translations;
   }
 
@@ -153,7 +160,9 @@ export async function getTranslationList() {
 
   // Sorting by surah and ayah keeps index alignment predictable.
   normalizedTranslations.sort((a, b) => a.surahId - b.surahId || a.ayahNumber - b.ayahNumber);
-  quranDataCache.translations = normalizedTranslations;
+  if (SHOULD_USE_DATA_CACHE) {
+    quranDataCache.translations = normalizedTranslations;
+  }
   return normalizedTranslations;
 }
 
