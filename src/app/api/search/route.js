@@ -11,9 +11,18 @@ function normalizeQuery(value) {
 
 // This route searches translation text and returns ayah matches with Surah context.
 export async function POST(request) {
+  // This variable stores parsed request body so invalid JSON can be handled separately.
+  let body;
+
   try {
-    // JSON body parsing is wrapped in try/catch by the route handler itself.
-    const body = await request.json();
+    // Malformed JSON should be treated as a client-side bad request.
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON payload." }, { status: 400 });
+  }
+
+  try {
+  // Parsed body is now validated for query-specific rules.
     const query = normalizeQuery(body?.query);
 
     // Empty queries are rejected to prevent unnecessary full-list scans.
