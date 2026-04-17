@@ -1,0 +1,155 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+
+// This debounce value keeps the global search responsive without flooding the API.
+const HEADER_SEARCH_DEBOUNCE_MS = 300;
+
+// This helper normalizes unknown payload values into predictable arrays.
+function toArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+// This global header provides cross-page navigation and search functionality.
+export default function AppHeader() {
+  // Query state drives live search requests from the shared header input.
+  const [query, setQuery] = useState("");
+
+  // Results state stores matched ayat references returned by /api/search.
+  const [results, setResults] = useState([]);
+
+  // Loading state powers subtle progress feedback while searching.
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Error state displays API validation/network issues in a compact way.
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Focus state controls result-panel visibility so it behaves like a simple combobox.
+  const [isFocused, setIsFocused] = useState(false);
+
+  // Trimmed query avoids unnecessary requests for whitespace-only input.
+  const trimmedQuery = useMemo(() => query.trim(), [query]);
+
+  useEffect(() => {
+    // Empty input clears stale results and exits early without network work.
+    if (!trimmedQuery) {
+      setResults([]);
+      setIsLoading(false);
+      setErrorMessage("");
+      return undefined;
+    }
+
+    // Abort controller prevents race conditions when query changes quickly.
+    const controller = new AbortController();
+
+    // Debounce batches keystrokes into fewer API calls.
+    const timerId = window.setTimeout(async () => {
+      try {
+        setIsLoading(true);
+        setErrorMessage("");
+
+        // Global search calls the same route used elsewhere for consistent logic.
+        const response = await fetch("/api/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: trimmedQuery }),
+          signal: controller.signal,
+        });
+
+        // Non-success responses are transformed into concise user-facing errors.
+        if (!response.ok) {
+          const payload = await response.json().catch(() => ({}));
+          const message = typeof payload?.error === "string" ? payload.error : "Search failed.";
+          throw new Error(message);
+        }
+
+        // Only first results are shown to keep header dropdown compact.
+        const payload = await response.json();
+        setResults(toArray(payload?.results).slice(0, 8));
+      } catch (error) {
+        // Abort is expected during fast typing and should not show an error message.
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        setResults([]);
+        setErrorMessage(error instanceof Error ? error.message : "Search failed.");
+      } finally {
+        setIsLoading(false);
+      }
+    }, HEADER_SEARCH_DEBOUNCE_MS);
+
+    // Cleanup clears timer and in-flight request on effect re-run/unmount.
+    return () => {
+      window.clearTimeout(timerId);
+      controller.abort();
+    };
+  }, [trimmedQuery]);
+
+  // Result panel is visible only when input is focused and there is meaningful state to display.
+  const showPanel = isFocused && (isLoading || errorMessage || trimmedQuery || results.length > 0);
+
+  return (
+    <header className="app-header">
+      {/* Brand link gives users a consistent way back to the home page. */}
+      <Link href="/" className="app-header-brand">
+        Quran Web Application
+      </Link>
+
+      {/* Controls are grouped and right-aligned as one unit on larger screens. */}
+      <div className="app-header-controls">
+        {/* Search section is global so users can search from any page. */}
+        <div className="app-header-search-shell">
+          <label htmlFor="global-header-search" className="visually-hidden">
+            Search translation text
+          </label>
+          <input
+            id="global-header-search"
+            type="text"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => {
+              // Delay close allows click interaction on result links before panel hides.
+              window.setTimeout(() => setIsFocused(false), 120);
+            }}
+            placeholder="Search translation..."
+            className="app-header-search-input"
+          />
+
+          {showPanel ? (
+            <div className="app-header-search-panel" role="listbox" aria-label="Header search results">
+              {isLoading ? <p className="app-header-search-status">Searching...</p> : null}
+              {errorMessage ? <p className="app-header-search-error">{errorMessage}</p> : null}
+
+              {!isLoading && !errorMessage && trimmedQuery && results.length === 0 ? (
+                <p className="app-header-search-status">No matches found.</p>
+              ) : null}
+
+              {!isLoading && !errorMessage && results.length > 0
+                ? results.map((result) => (
+                    <Link
+                      key={`${result.surahId}-${result.ayahNumber}-${result.text}`}
+                      href={`/surah/${result.surahId}`}
+                      className="app-header-search-result"
+                    >
+                      <span className="app-header-search-result-meta">
+                        Surah {result.surahId} | Ayah {result.ayahNumber}
+                      </span>
+                      <span className="app-header-search-result-text">{result.text}</span>
+                    </Link>
+                  ))
+                : null}
+            </div>
+          ) : null}
+        </div>
+
+        {/* Settings button remains globally accessible by user request. */}
+        <Link href="/settings" className="app-header-settings-button">
+          Reader Settings
+        </Link>
+      </div>
+    </header>
+  );
+}

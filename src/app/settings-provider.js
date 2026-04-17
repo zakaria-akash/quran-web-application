@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useSyncExternalStore,
+} from "react";
 import {
   getDefaultSettings,
   mergeSettingsWithDefaults,
@@ -10,6 +17,56 @@ import {
 
 // This context carries reader settings and mutators to any client component in the app tree.
 const ReaderSettingsContext = createContext(null);
+
+// This default snapshot stays stable across server renders and initial hydration.
+const defaultSettingsSnapshot = Object.freeze(getDefaultSettings());
+
+// This mutable snapshot is the single source of truth for the client-side settings store.
+let currentSettingsSnapshot = defaultSettingsSnapshot;
+
+// This guard ensures localStorage hydration happens once per client runtime.
+let hasHydratedFromStorage = false;
+
+// This listener registry powers a small local settings store for subscription updates.
+const settingsStoreListeners = new Set();
+
+// This helper notifies all subscribers after settings changes.
+function emitSettingsStoreChange() {
+  settingsStoreListeners.forEach((listener) => listener());
+}
+
+// This subscribe hook is used by useSyncExternalStore for safe hydration behavior.
+function subscribeToSettingsStore(listener) {
+  settingsStoreListeners.add(listener);
+  return () => {
+    settingsStoreListeners.delete(listener);
+  };
+}
+
+// This server snapshot guarantees deterministic values during SSR and hydration.
+function getSettingsServerSnapshot() {
+  return defaultSettingsSnapshot;
+}
+
+// This client snapshot returns a stable object reference unless an explicit store update occurs.
+function getSettingsClientSnapshot() {
+  return currentSettingsSnapshot;
+}
+
+// This one-time hydrator imports persisted settings and updates subscribers when needed.
+function hydrateSettingsStoreFromStorage() {
+  if (typeof window === "undefined" || hasHydratedFromStorage) {
+    return;
+  }
+
+  hasHydratedFromStorage = true;
+  const hydratedSettings = mergeSettingsWithDefaults(readSettingsFromStorage());
+
+  if (JSON.stringify(hydratedSettings) !== JSON.stringify(currentSettingsSnapshot)) {
+    currentSettingsSnapshot = hydratedSettings;
+    emitSettingsStoreChange();
+  }
+}
 
 // This hook gives consumer components typed access to settings state and actions.
 export function useReaderSettings() {
@@ -22,26 +79,36 @@ export function useReaderSettings() {
 
 // This provider centralizes settings persistence and applies CSS variables for global styling.
 export function ReaderSettingsProvider({ children }) {
-  // Lazy initialization hydrates from localStorage in browser and uses defaults on server.
-  const [settings, setSettings] = useState(() => {
-    if (typeof window === "undefined") {
-      return getDefaultSettings();
-    }
-    return readSettingsFromStorage();
-  });
+  // External-store hydration keeps first client render aligned with server-rendered markup.
+  const settings = useSyncExternalStore(
+    subscribeToSettingsStore,
+    getSettingsClientSnapshot,
+    getSettingsServerSnapshot,
+  );
+
+  // Hydrate persisted settings after mount so SSR and initial hydration remain deterministic.
+  useEffect(() => {
+    hydrateSettingsStoreFromStorage();
+  }, []);
 
   // This callback merges updates, persists them, and updates state in one path.
   const updateSettings = useCallback((partialUpdate) => {
-    const mergedSettings = mergeSettingsWithDefaults({ ...settings, ...partialUpdate });
-    const persistedSettings = saveSettingsToStorage(mergedSettings);
-    setSettings(persistedSettings);
-  }, [settings]);
+    const mergedSettings = mergeSettingsWithDefaults({ ...currentSettingsSnapshot, ...partialUpdate });
+    saveSettingsToStorage(mergedSettings);
+
+    // Store snapshot is updated before notification so subscribers read the latest values.
+    currentSettingsSnapshot = mergedSettings;
+    emitSettingsStoreChange();
+  }, []);
 
   // This callback restores defaults and persists the reset immediately.
   const resetSettings = useCallback(() => {
     const defaultSettings = getDefaultSettings();
-    const persistedDefaults = saveSettingsToStorage(defaultSettings);
-    setSettings(persistedDefaults);
+    saveSettingsToStorage(defaultSettings);
+
+    // Reset updates store snapshot and triggers a re-render for subscribed components.
+    currentSettingsSnapshot = defaultSettings;
+    emitSettingsStoreChange();
   }, []);
 
   // These CSS variables apply reader preferences to all descendant pages consistently.

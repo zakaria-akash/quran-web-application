@@ -1,5 +1,6 @@
 import "./globals.css";
 import { ReaderSettingsProvider } from "./settings-provider";
+import AppHeader from "./app-header";
 
 export const metadata = {
   title: "Quran Web Application",
@@ -11,7 +12,18 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         {/* Global provider makes settings available across all client views. */}
-        <ReaderSettingsProvider>{children}</ReaderSettingsProvider>
+        <ReaderSettingsProvider>
+          {/* The app shell keeps header/footer consistent across all routes. */}
+          <div className="app-shell">
+            <AppHeader />
+
+            {/* Main content area renders route-specific page content. */}
+            <div className="app-main-content">{children}</div>
+
+            {/* Minimal footer provides a stable endpoint for each page. */}
+            <footer className="app-footer">Quran Web Application</footer>
+          </div>
+        </ReaderSettingsProvider>
       </body>
     </html>
   );

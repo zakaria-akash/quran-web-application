@@ -23,9 +23,6 @@ export default function SettingsPage() {
         <Link href="/" className="back-link">
           Back To Surah List
         </Link>
-        <Link href="/search" className="back-link secondary-back-link">
-          Open Search
-        </Link>
       </div>
 
       {/* Header communicates scope and persistence behavior clearly. */}

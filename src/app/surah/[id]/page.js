@@ -53,9 +53,6 @@ export default async function SurahDetailPage({ params }) {
         <Link href="/" className="back-link">
           Back To Surah List
         </Link>
-        <Link href="/search" className="back-link secondary-back-link">
-          Open Search
-        </Link>
         <Link href="/settings" className="back-link secondary-back-link">
           Reader Settings
         </Link>
