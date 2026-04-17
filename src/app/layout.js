@@ -10,7 +10,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
+      <body suppressHydrationWarning>
         {/* Global provider makes settings available across all client views. */}
         <ReaderSettingsProvider>
           {/* The app shell keeps header/footer consistent across all routes. */}

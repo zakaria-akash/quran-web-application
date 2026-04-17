@@ -378,8 +378,7 @@ body {
 /* The slider panel keeps a consistent height across Surahs for a stable layout. */
 .ayah-slider-viewport {
   height: fit-content;
-  max-height: clamp(420px, 64vh, 680px);
-  overflow-y: hidden;
+  overflow-y: visible;
   overflow-x: hidden;
   border-radius: 16px;
 }
@@ -387,17 +386,21 @@ body {
 /* Track uses translate animation for smooth prev/next transitions. */
 .ayah-slider-track {
   display: flex;
-    align-items: stretch;
+  align-items: flex-start;
     width: 100%;
   min-height: 1px;
   transition: transform 280ms ease;
-    will-change: transform;
+  will-change: transform;
 }
 
 /* Each slide occupies full viewport width to emulate a panel carousel. */
 .ayah-slide {
   flex: 0 0 100%;
+  display: flex;
+    flex-direction: column;
   width: 100%;
+  height: fit-content;
+    max-height: clamp(420px, 64vh, 680px);
   box-sizing: border-box;
   background: linear-gradient(160deg, rgba(8, 18, 30, 0.92) 0%, rgba(11, 30, 48, 0.92) 100%);
   border: 1px solid rgba(182, 204, 255, 0.24);
@@ -978,6 +981,10 @@ body {
 }
 
 .ayah-slider-viewport {
+  max-height: none;
+  }
+  
+  .ayah-slide {
   max-height: clamp(380px, 62vh, 560px);
 }
 }
