@@ -1,4 +1,5 @@
 import "./globals.css";
+import { ReaderSettingsProvider } from "./settings-provider";
 
 export const metadata = {
   title: "Quran Web Application",
@@ -8,7 +9,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {/* Global provider makes settings available across all client views. */}
+        <ReaderSettingsProvider>{children}</ReaderSettingsProvider>
+      </body>
     </html>
   );
 }

@@ -94,6 +94,9 @@ export default function SearchPage() {
         <Link href="/" className="back-link">
           Back To Surah List
         </Link>
+        <Link href="/settings" className="back-link secondary-back-link">
+          Reader Settings
+        </Link>
       </div>
 
       {/* Heading and subtitle describe search scope and expected query type. */}

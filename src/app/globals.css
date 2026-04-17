@@ -4,6 +4,9 @@
   --color-navy: #0d1b2a;
   --color-text-light: #e0e1dd;
   --font-ui: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --qwa-arabic-font-family: "Amiri", serif;
+    --qwa-arabic-font-size: 36px;
+    --qwa-translation-font-size: 18px;
 }
 
 /* Global reset for predictable box sizing behavior across components. */
@@ -22,9 +25,13 @@ body {
 body {
   background: linear-gradient(160deg, var(--color-black) 0%, var(--color-navy) 100%);
   color: var(--color-text-light);
-    font-family: var(--font-ui);
+  font-family: var(--font-ui);
 }
 
+/* This wrapper ensures settings variables scope all application pages uniformly. */
+.reader-settings-scope {
+  min-height: 100vh;
+}
 /* Home page container keeps top alignment and centered text with safe padding. */
 .home-page {
   min-height: 100vh;
@@ -129,7 +136,8 @@ body {
 
 /* Arabic name gets larger type size and right-aligned reading direction support. */
 .surah-name-arabic {
-  font-size: 1.45rem;
+  font-size: calc(var(--qwa-arabic-font-size) * 0.6);
+    font-family: var(--qwa-arabic-font-family);
   direction: rtl;
   text-align: right;
 }
@@ -186,7 +194,8 @@ body {
 /* Arabic name appears as a co-primary label below the English heading. */
 .surah-detail-arabic-name {
   margin: 6px 0;
-  font-size: 1.8rem;
+  font-size: calc(var(--qwa-arabic-font-size) * 0.75);
+    font-family: var(--qwa-arabic-font-family);
   direction: rtl;
   text-align: right;
 }
@@ -234,7 +243,8 @@ body {
   margin: 0;
   direction: rtl;
   text-align: right;
-  font-size: clamp(1.4rem, 1.1vw + 1.1rem, 2rem);
+  font-size: var(--qwa-arabic-font-size);
+    font-family: var(--qwa-arabic-font-family);
   line-height: 1.8;
 }
 
@@ -242,6 +252,7 @@ body {
 .ayah-translation-text {
   margin: 10px 0 0;
   color: #d5d8df;
+  font-size: var(--qwa-translation-font-size);
   line-height: 1.6;
 }
 
@@ -372,6 +383,7 @@ body {
 /* Translation text is primary content and receives stronger foreground contrast. */
 .search-result-text {
   margin: 10px 0;
+  font-size: var(--qwa-translation-font-size);
   line-height: 1.6;
 }
 
@@ -387,4 +399,134 @@ body {
 .search-result-link:focus-visible {
   text-decoration: underline;
   outline: none;
+}
+/* Settings page container follows the same centered page rhythm as other main routes. */
+.settings-page {
+  min-height: 100vh;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* Top bar keeps route navigation stable while adjusting preferences. */
+.settings-topbar {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+/* Header section frames personalization purpose and persistence behavior. */
+.settings-header {
+  margin-bottom: 18px;
+}
+
+/* Settings title remains visually consistent with other route-level headings. */
+.settings-title {
+  margin: 0;
+  font-size: clamp(1.6rem, 1.8vw + 1rem, 2.5rem);
+}
+
+/* Subtitle gives guidance while keeping a secondary visual weight. */
+.settings-subtitle {
+  margin: 8px 0 0;
+  color: #c4cbd8;
+}
+
+/* Control panel groups form fields in a card-style container for clarity. */
+.settings-panel {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Each field uses a compact vertical layout for label-control readability. */
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Labels keep controls understandable and accessible across screen sizes. */
+.settings-label {
+  font-weight: 600;
+}
+
+/* Select control styling matches the dark theme and form control language. */
+.settings-select {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-light);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+/* Range controls are full-width so values are easy to tune on touch devices. */
+.settings-range {
+  width: 100%;
+}
+
+/* Focus-visible styles improve keyboard navigation clarity in settings controls. */
+.settings-select:focus-visible,
+.settings-range:focus-visible,
+.settings-reset-button:focus-visible {
+  outline: 2px solid #9fb7ff;
+  outline-offset: 2px;
+}
+
+/* Actions row keeps reset button placement stable and visually separated. */
+.settings-actions {
+  margin-top: 4px;
+}
+
+/* Reset button uses a subtle contrast style appropriate for secondary actions. */
+.settings-reset-button {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-light);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Hover feedback keeps pointer interactivity obvious without visual noise. */
+.settings-reset-button:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* Preview card gives immediate visual confirmation of applied settings values. */
+.settings-preview {
+  margin-top: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+/* Preview heading labels the sample area for assistive technologies and users. */
+.settings-preview-title {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+
+/* Arabic preview uses the same runtime settings variables as Surah pages. */
+.settings-preview-arabic {
+  margin: 0;
+  direction: rtl;
+  text-align: right;
+  font-family: var(--qwa-arabic-font-family);
+  font-size: var(--qwa-arabic-font-size);
+  line-height: 1.8;
+}
+
+/* Translation preview mirrors Surah translation settings for immediate comparison. */
+.settings-preview-translation {
+  margin: 10px 0 0;
+  font-size: var(--qwa-translation-font-size);
+  line-height: 1.6;
+  color: #d7dce5;
 }

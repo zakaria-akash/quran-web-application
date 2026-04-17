@@ -56,6 +56,9 @@ export default async function SurahDetailPage({ params }) {
         <Link href="/search" className="back-link secondary-back-link">
           Open Search
         </Link>
+        <Link href="/settings" className="back-link secondary-back-link">
+          Reader Settings
+        </Link>
       </div>
 
       {/* This header identifies the Surah clearly in both naming styles. */}

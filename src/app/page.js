@@ -19,6 +19,9 @@ export default async function Home() {
         <Link href="/search" className="action-link">
           Open Search
         </Link>
+        <Link href="/settings" className="action-link">
+          Reader Settings
+        </Link>
       </div>
 
       {/* This grid renders one card per surah and links to the dynamic surah route. */}
