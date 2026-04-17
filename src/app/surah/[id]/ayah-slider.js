@@ -75,11 +75,15 @@ export default function AyahSlider({ ayat, initialAyahNumber = null }) {
 
       {/* Slider viewport masks off-screen slides while preserving smooth transitions. */}
       <div className="ayah-slider-viewport">
-        <div className="ayah-slider-track" aria-live="polite">
+        <div
+          className="ayah-slider-track"
+          style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+          aria-live="polite"
+        >
           {ayat.map((ayah, index) => (
             <article
               key={`${ayah.surahId}-${ayah.ayahNumber}`}
-              className={`ayah-slide ${index === activeIndex ? "is-active" : "is-inactive"}`}
+              className="ayah-slide"
               aria-hidden={index !== activeIndex}
             >
               <p className="ayah-number">Ayah {ayah.ayahNumber}</p>

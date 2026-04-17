@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import SettingsModal from "./settings/settings-modal";
 
 // This debounce value keeps the global search responsive without flooding the API.
 const HEADER_SEARCH_DEBOUNCE_MS = 300;
@@ -84,6 +85,9 @@ export default function AppHeader() {
 
   // Focus state controls result-panel visibility so it behaves like a simple combobox.
   const [isFocused, setIsFocused] = useState(false);
+
+  // Modal state keeps reader settings in-context instead of routing away.
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   // This ref tracks the search shell so outside-click close behavior is reliable.
   const searchShellRef = useRef(null);
@@ -209,6 +213,14 @@ export default function AppHeader() {
     setIsFocused(false);
   };
 
+  const openSettingsModal = () => {
+    setIsSettingsModalOpen(true);
+  };
+
+  const closeSettingsModal = () => {
+    setIsSettingsModalOpen(false);
+  };
+
   return (
     <header className="app-header">
       {/* Brand link gives users a consistent way back to the home page. */}
@@ -288,11 +300,13 @@ export default function AppHeader() {
           ) : null}
         </div>
 
-        {/* Settings button remains globally accessible by user request. */}
-        <Link href="/settings" className="app-header-settings-button">
+        {/* Settings open in a modal so users keep their current reading context. */}
+        <button type="button" className="app-header-settings-button" onClick={openSettingsModal}>
           Reader Settings
-        </Link>
+        </button>
       </div>
+
+      <SettingsModal isOpen={isSettingsModalOpen} onClose={closeSettingsModal} />
     </header>
   );
 }

@@ -67,9 +67,6 @@ export default async function SurahDetailPage({ params, searchParams }) {
         <Link href="/" className="back-link">
           Back To Surah List
         </Link>
-        <Link href="/settings" className="back-link secondary-back-link">
-          Reader Settings
-        </Link>
       </div>
 
       {/* This header identifies the Surah clearly in both naming styles. */}

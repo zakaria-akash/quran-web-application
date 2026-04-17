@@ -186,6 +186,8 @@ body {
   font-weight: 600;
   padding: 8px 12px;
   white-space: nowrap;
+  cursor: pointer;
+    font: inherit;
 }
 
 /* Button feedback keeps focus and hover behavior clear and accessible. */
@@ -254,6 +256,35 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
   text-align: left;
+  max-height: calc(100dvh - 240px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-block: 10px;
+    padding-right: 6px;
+  }
+  
+  /* Thin scrollbar keeps dense Surah lists usable without visual heaviness. */
+  .surah-grid {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(159, 183, 255, 0.55) rgba(255, 255, 255, 0.08);
+  }
+  
+  .surah-grid::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  .surah-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+  }
+  
+  .surah-grid::-webkit-scrollbar-thumb {
+    background: rgba(159, 183, 255, 0.55);
+    border-radius: 999px;
+  }
+  
+  .surah-grid::-webkit-scrollbar-thumb:hover {
+    background: rgba(159, 183, 255, 0.75);
 }
 
 /* Each card is a full-area link with contrast, hover, and focus affordances. */
@@ -348,41 +379,35 @@ body {
 .ayah-slider-viewport {
   height: fit-content;
   max-height: clamp(420px, 64vh, 680px);
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
   border-radius: 16px;
 }
 
 /* Track uses translate animation for smooth prev/next transitions. */
 .ayah-slider-track {
-  position: relative;
+  display: flex;
+    align-items: stretch;
+    width: 100%;
   min-height: 1px;
+  transition: transform 280ms ease;
+    will-change: transform;
 }
 
 /* Each slide occupies full viewport width to emulate a panel carousel. */
 .ayah-slide {
-  display: none;
+  flex: 0 0 100%;
   width: 100%;
   box-sizing: border-box;
   background: linear-gradient(160deg, rgba(8, 18, 30, 0.92) 0%, rgba(11, 30, 48, 0.92) 100%);
   border: 1px solid rgba(182, 204, 255, 0.24);
   border-radius: 16px;
   padding: 18px;
+  overflow-y: auto;
 }
 
-/* The active slide is the only slide that affects layout height. */
-.ayah-slide.is-active {
-  display: flex;
-  flex-direction: column;
-  animation: ayah-slide-enter 220ms ease;
-}
-
-/* Inactive slides remain out of layout flow so they cannot inflate height. */
-.ayah-slide.is-inactive {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  pointer-events: none;
+.ayah-slide>* {
+  max-width: 100%;
 }
 
 /* Arabic frame adds subtle ornamentation while preserving readability. */
@@ -462,16 +487,10 @@ body {
   font-weight: 600;
 }
 
-/* Simple entrance motion keeps the panel feeling responsive without auto-sliding. */
-@keyframes ayah-slide-enter {
-  from {
-    opacity: 0;
-    transform: translateX(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
+/* Reduced motion users should get instant transitions for accessibility comfort. */
+@media (prefers-reduced-motion: reduce) {
+  .ayah-slider-track {
+    transition: none;
   }
 }
 /* Surah header creates a clean visual hierarchy before the ayah list begins. */
@@ -823,6 +842,108 @@ body {
   font-size: var(--qwa-translation-font-size);
   line-height: 1.6;
   color: #d7dce5;
+}
+/* Modal backdrop keeps focus on settings while dimming the reader view behind it. */
+.settings-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(1, 6, 12, 0.72);
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+
+/* Dialog panel follows existing card language while allowing scroll for smaller screens. */
+.settings-modal {
+  width: min(920px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(180deg, rgba(12, 23, 37, 0.98) 0%, rgba(7, 16, 28, 0.98) 100%);
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.45);
+}
+
+/* Header keeps title/context visible while body can scroll independently. */
+.settings-modal-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  display: block;
+}
+
+/* Body scroll ensures full settings remain reachable on compact devices. */
+.settings-modal-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* Footer anchors the close control at the bottom center of the modal. */
+.settings-modal-footer {
+  padding: 14px 20px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  width: 100%;
+  display: grid;
+  place-items: center;
+}
+
+/* Close control mirrors other secondary actions and remains keyboard visible. */
+.settings-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-inline: auto;
+  background: rgba(255, 255, 255, 0.08);
+  color: #e4e9f4;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.settings-modal-close:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.settings-modal-close:focus-visible {
+  outline: 2px solid #9fb7ff;
+  outline-offset: 2px;
+}
+
+/* Compact modal layout keeps all controls visible and reachable on smaller devices. */
+@media (max-width: 700px) {
+  .settings-modal {
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+    max-height: calc(100dvh - 16px);
+    border-radius: 12px;
+  }
+
+  .settings-modal-header {
+    padding: 14px;
+  }
+
+  .settings-modal-content {
+    padding: 14px;
+  }
+
+  .settings-modal-footer {
+    padding: 12px 14px 14px;
+  }
+
+  .surah-grid {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
 }
 /* Mobile header stacks controls for easier tap interaction and better spacing. */
 @media (max-width: 880px) {
