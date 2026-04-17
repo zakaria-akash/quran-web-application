@@ -1,5 +1,9 @@
 # Quran Web Application (QWA)
 
+Live application:
+
+- <https://quran-web-application.vercel.app/>
+
 A production-ready Quran reader built on Next.js App Router (JavaScript only), with:
 
 - complete Surah index (114)

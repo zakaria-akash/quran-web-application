@@ -1,5 +1,9 @@
 # QWA Phase 5 QA Sign-Off
 
+Production URL:
+
+- <https://quran-web-application.vercel.app/>
+
 This checklist captures release readiness for the MVP scope.
 
 ## Scope Verification
