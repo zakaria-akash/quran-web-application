@@ -65,6 +65,8 @@ body {
   color: #f0f2f7;
   text-decoration: none;
   font-weight: 700;
+  font-size: clamp(1.25rem, 1.25vw + 0.9rem, 1.7rem);
+    line-height: 1.15;
   white-space: nowrap;
 }
 
@@ -121,6 +123,21 @@ body {
   padding: 10px 12px;
 }
 
+/* Search groups separate Surah matches from ayah matches inside the dropdown. */
+.app-header-search-group {
+  padding: 6px 0;
+}
+
+/* Group title keeps the dropdown readable without introducing extra visual noise. */
+.app-header-search-group-title {
+  margin: 0;
+  padding: 8px 12px 6px;
+  color: #9fb7ff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
 /* Error message uses warm contrast to stand out from normal status copy. */
 .app-header-search-error {
   color: #ffb8b8;
@@ -319,6 +336,143 @@ body {
 /* Secondary back links are visually differentiated while keeping shared behavior. */
 .secondary-back-link {
   color: #d0dcff;
+}
+/* Slider container keeps ayah content focused within a polished presentation area. */
+.ayah-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* The slider panel keeps a consistent height across Surahs for a stable layout. */
+.ayah-slider-viewport {
+  height: fit-content;
+  max-height: clamp(420px, 64vh, 680px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 16px;
+}
+
+/* Track uses translate animation for smooth prev/next transitions. */
+.ayah-slider-track {
+  position: relative;
+  min-height: 1px;
+}
+
+/* Each slide occupies full viewport width to emulate a panel carousel. */
+.ayah-slide {
+  display: none;
+  width: 100%;
+  box-sizing: border-box;
+  background: linear-gradient(160deg, rgba(8, 18, 30, 0.92) 0%, rgba(11, 30, 48, 0.92) 100%);
+  border: 1px solid rgba(182, 204, 255, 0.24);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+/* The active slide is the only slide that affects layout height. */
+.ayah-slide.is-active {
+  display: flex;
+  flex-direction: column;
+  animation: ayah-slide-enter 220ms ease;
+}
+
+/* Inactive slides remain out of layout flow so they cannot inflate height. */
+.ayah-slide.is-inactive {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Arabic frame adds subtle ornamentation while preserving readability. */
+.ayah-arabic-frame {
+  position: relative;
+  margin-top: 8px;
+  border-radius: 14px;
+  border: 1px solid rgba(205, 185, 129, 0.42);
+  background: linear-gradient(140deg, rgba(17, 32, 50, 0.9) 0%, rgba(11, 22, 35, 0.9) 100%);
+  padding: 16px;
+}
+
+/* Corner accents mimic a refined Arabic manuscript-style frame. */
+.ayah-arabic-frame::before,
+.ayah-arabic-frame::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(224, 205, 148, 0.68);
+}
+
+.ayah-arabic-frame::before {
+  top: 8px;
+  right: 8px;
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.ayah-arabic-frame::after {
+  bottom: 8px;
+  left: 8px;
+  border-right: 0;
+  border-top: 0;
+}
+
+/* Slider controls balance navigation and progress with consistent theme colors. */
+.ayah-slider-controls {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Prev/next actions are compact and professional in the existing visual language. */
+.ayah-slider-button {
+  border: 1px solid rgba(159, 183, 255, 0.4);
+  background: rgba(159, 183, 255, 0.2);
+  color: #dbe6ff;
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Hover and focus states preserve keyboard and pointer clarity. */
+.ayah-slider-button:hover,
+.ayah-slider-button:focus-visible {
+  background: rgba(159, 183, 255, 0.3);
+  outline: 2px solid #9fb7ff;
+  outline-offset: 2px;
+}
+
+/* Disabled state avoids accidental navigation beyond slide boundaries. */
+.ayah-slider-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Counter keeps users oriented as they manually move between ayat. */
+.ayah-slider-counter {
+  margin: 0;
+  text-align: center;
+  color: #c8d1e9;
+  font-weight: 600;
+}
+
+/* Simple entrance motion keeps the panel feeling responsive without auto-sliding. */
+@keyframes ayah-slide-enter {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 /* Surah header creates a clean visual hierarchy before the ayah list begins. */
 .surah-detail-header {
@@ -677,7 +831,8 @@ body {
   }
 
   .app-header-brand {
-    justify-self: start;
+    justify-self: center;
+      text-align: center;
   }
 
   .app-header-controls {
@@ -688,4 +843,20 @@ body {
   .app-header-search-shell {
     width: 100%;
   }
+.ayah-slide {
+  padding: 14px;
+}
+
+.ayah-slider-controls {
+  grid-template-columns: 1fr 1fr;
+}
+
+.ayah-slider-counter {
+  grid-column: span 2;
+  order: 3;
+}
+
+.ayah-slider-viewport {
+  max-height: clamp(380px, 62vh, 560px);
+}
 }

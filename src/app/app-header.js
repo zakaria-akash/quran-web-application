@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 // This debounce value keeps the global search responsive without flooding the API.
 const HEADER_SEARCH_DEBOUNCE_MS = 300;
@@ -11,13 +11,70 @@ function toArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
+// This helper strips punctuation and spacing so transliterated names can match more loosely.
+function normalizeSearchText(value) {
+  return typeof value === "string" ? value.toLowerCase().replace(/[^a-z0-9\u0600-\u06ff]+/g, "") : "";
+}
+
+// This helper computes a small edit distance for short surah-name comparisons.
+function getEditDistance(leftText, rightText) {
+  const left = normalizeSearchText(leftText);
+  const right = normalizeSearchText(rightText);
+
+  if (!left || !right) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  const row = Array.from({ length: right.length + 1 }, (_, index) => index);
+
+  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
+    let previousDiagonal = row[0];
+    row[0] = leftIndex;
+
+    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
+      const savedValue = row[rightIndex];
+      if (left[leftIndex - 1] === right[rightIndex - 1]) {
+        row[rightIndex] = previousDiagonal;
+      } else {
+        row[rightIndex] = Math.min(previousDiagonal, row[rightIndex], row[rightIndex - 1]) + 1;
+      }
+      previousDiagonal = savedValue;
+    }
+  }
+
+  return row[right.length];
+}
+
+// This helper gives surah-name search a little flexibility for common transliterations.
+function matchSurahQuery(query, surah) {
+  const normalizedQuery = normalizeSearchText(query);
+  const normalizedEnglishName = normalizeSearchText(surah.nameEnglish);
+  const normalizedArabicName = normalizeSearchText(surah.nameArabic);
+
+  if (!normalizedQuery) {
+    return false;
+  }
+
+  if (normalizedEnglishName.includes(normalizedQuery) || normalizedArabicName.includes(normalizedQuery)) {
+    return true;
+  }
+
+  return getEditDistance(normalizedQuery, normalizedEnglishName) <= 2;
+}
+
 // This global header provides cross-page navigation and search functionality.
 export default function AppHeader() {
   // Query state drives live search requests from the shared header input.
   const [query, setQuery] = useState("");
 
+  // Surah list is cached client-side so name searches can work without translation hits.
+  const [surahs, setSurahs] = useState([]);
+
   // Results state stores matched ayat references returned by /api/search.
   const [results, setResults] = useState([]);
+
+  // Surah name matches are shown alongside translation matches.
+  const [surahMatches, setSurahMatches] = useState([]);
 
   // Loading state powers subtle progress feedback while searching.
   const [isLoading, setIsLoading] = useState(false);
@@ -28,17 +85,69 @@ export default function AppHeader() {
   // Focus state controls result-panel visibility so it behaves like a simple combobox.
   const [isFocused, setIsFocused] = useState(false);
 
+  // This ref tracks the search shell so outside-click close behavior is reliable.
+  const searchShellRef = useRef(null);
+
   // Trimmed query avoids unnecessary requests for whitespace-only input.
   const trimmedQuery = useMemo(() => query.trim(), [query]);
+
+  // Load Surah metadata once so name-based search can happen locally.
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadSurahList() {
+      try {
+        const response = await fetch("/api/quran", { signal: controller.signal });
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = await response.json();
+        setSurahs(toArray(payload?.surahs));
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+      }
+    }
+
+    loadSurahList();
+
+    return () => controller.abort();
+  }, []);
+
+  // Close dropdown only when clicking outside, so link clicks inside the panel are not interrupted.
+  useEffect(() => {
+    function handlePointerDown(event) {
+      const shell = searchShellRef.current;
+      if (!shell) {
+        return;
+      }
+
+      if (!shell.contains(event.target)) {
+        setIsFocused(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, []);
 
   useEffect(() => {
     // Empty input clears stale results and exits early without network work.
     if (!trimmedQuery) {
       setResults([]);
+      setSurahMatches([]);
       setIsLoading(false);
       setErrorMessage("");
       return undefined;
     }
+
+    // Surah names are matched locally so user typos like Al-Baqara still find the Surah.
+    const matchedSurahs = surahs.filter((surah) => matchSurahQuery(trimmedQuery, surah)).slice(0, 8);
+    setSurahMatches(matchedSurahs);
 
     // Abort controller prevents race conditions when query changes quickly.
     const controller = new AbortController();
@@ -85,10 +194,20 @@ export default function AppHeader() {
       window.clearTimeout(timerId);
       controller.abort();
     };
-  }, [trimmedQuery]);
+  }, [surahs, trimmedQuery]);
 
   // Result panel is visible only when input is focused and there is meaningful state to display.
-  const showPanel = isFocused && (isLoading || errorMessage || trimmedQuery || results.length > 0);
+  const showPanel = isFocused && (isLoading || errorMessage || trimmedQuery || results.length > 0 || surahMatches.length > 0);
+
+  // Clicking a result should reset the search box and close the dropdown immediately.
+  const handleResultSelection = () => {
+    setQuery("");
+    setResults([]);
+    setSurahMatches([]);
+    setErrorMessage("");
+    setIsLoading(false);
+    setIsFocused(false);
+  };
 
   return (
     <header className="app-header">
@@ -100,9 +219,9 @@ export default function AppHeader() {
       {/* Controls are grouped and right-aligned as one unit on larger screens. */}
       <div className="app-header-controls">
         {/* Search section is global so users can search from any page. */}
-        <div className="app-header-search-shell">
+        <div className="app-header-search-shell" ref={searchShellRef}>
           <label htmlFor="global-header-search" className="visually-hidden">
-            Search translation text
+            Search translation text or Surah name
           </label>
           <input
             id="global-header-search"
@@ -110,11 +229,12 @@ export default function AppHeader() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onFocus={() => setIsFocused(true)}
-            onBlur={() => {
-              // Delay close allows click interaction on result links before panel hides.
-              window.setTimeout(() => setIsFocused(false), 120);
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                setIsFocused(false);
+              }
             }}
-            placeholder="Search translation..."
+            placeholder="Search translation or Surah..."
             className="app-header-search-input"
           />
 
@@ -123,24 +243,47 @@ export default function AppHeader() {
               {isLoading ? <p className="app-header-search-status">Searching...</p> : null}
               {errorMessage ? <p className="app-header-search-error">{errorMessage}</p> : null}
 
-              {!isLoading && !errorMessage && trimmedQuery && results.length === 0 ? (
-                <p className="app-header-search-status">No matches found.</p>
+              {!isLoading && !errorMessage && surahMatches.length > 0 ? (
+                <div className="app-header-search-group">
+                  <p className="app-header-search-group-title">Surahs</p>
+                  {surahMatches.map((surah) => (
+                    <Link
+                      key={surah.id}
+                      href={`/surah/${surah.id}`}
+                      className="app-header-search-result"
+                      onClick={handleResultSelection}
+                    >
+                      <span className="app-header-search-result-meta">
+                        Surah {surah.id} | {surah.nameEnglish}
+                      </span>
+                      <span className="app-header-search-result-text">{surah.nameArabic}</span>
+                    </Link>
+                  ))}
+                </div>
               ) : null}
 
-              {!isLoading && !errorMessage && results.length > 0
-                ? results.map((result) => (
+              {!isLoading && !errorMessage && trimmedQuery && results.length > 0 ? (
+                <div className="app-header-search-group">
+                  <p className="app-header-search-group-title">Ayah Matches</p>
+                  {results.map((result) => (
                     <Link
                       key={`${result.surahId}-${result.ayahNumber}-${result.text}`}
-                      href={`/surah/${result.surahId}`}
+                      href={`/surah/${result.surahId}?ayah=${result.ayahNumber}`}
                       className="app-header-search-result"
+                      onClick={handleResultSelection}
                     >
                       <span className="app-header-search-result-meta">
                         Surah {result.surahId} | Ayah {result.ayahNumber}
                       </span>
                       <span className="app-header-search-result-text">{result.text}</span>
                     </Link>
-                  ))
-                : null}
+                  ))}
+                </div>
+              ) : null}
+
+              {!isLoading && !errorMessage && trimmedQuery && surahMatches.length === 0 && results.length === 0 ? (
+                <p className="app-header-search-status">No matches found.</p>
+              ) : null}
             </div>
           ) : null}
         </div>

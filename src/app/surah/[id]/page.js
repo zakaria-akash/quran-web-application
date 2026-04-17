@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSurahContent, getSurahList } from "@/lib/quran";
+import AyahSlider from "./ayah-slider";
 
 // This configuration ensures only generated static params are valid route entries.
 export const dynamicParams = false;
@@ -23,10 +24,20 @@ function parseRouteSurahId(rawId) {
   return parsed;
 }
 
+// This helper parses optional ayah query values used for direct navigation from search.
+function parseRouteAyahNumber(rawAyah) {
+  const parsed = Number(rawAyah);
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    return null;
+  }
+  return parsed;
+}
+
 // This page renders one Surah with Arabic ayat and English translation.
-export default async function SurahDetailPage({ params }) {
+export default async function SurahDetailPage({ params, searchParams }) {
   // Params can be async in the App Router, so we await before reading id.
   const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
 
   // Invalid ids are treated as unknown routes and sent to not-found UI.
   const surahId = parseRouteSurahId(resolvedParams?.id);
@@ -45,6 +56,9 @@ export default async function SurahDetailPage({ params }) {
   if (!surahMeta) {
     notFound();
   }
+
+  // Optional ayah query allows deep-linking directly to a specific ayah panel.
+  const initialAyahNumber = parseRouteAyahNumber(resolvedSearchParams?.ayah);
 
   return (
     <main className="surah-detail-page">
@@ -71,21 +85,8 @@ export default async function SurahDetailPage({ params }) {
           No ayat data is currently available for this Surah.
         </section>
       ) : (
-        // This list renders ayat blocks with Arabic text and translation side by side in one flow.
-        <section className="ayah-list" aria-label="Ayat list">
-          {surahContent.map((ayah) => (
-            <article key={`${ayah.surahId}-${ayah.ayahNumber}`} className="ayah-card">
-              {/* Ayah number acts as a stable visual and reference anchor. */}
-              <p className="ayah-number">Ayah {ayah.ayahNumber}</p>
-
-              {/* Arabic text is separated for readability and future font customization. */}
-              <p className="ayah-arabic-text">{ayah.arabicText}</p>
-
-              {/* Translation text gives the English understanding for each ayah. */}
-              <p className="ayah-translation-text">{ayah.translationText || "Translation unavailable."}</p>
-            </article>
-          ))}
-        </section>
+          // Manual-only slider provides focused ayah reading with previous/next controls.
+          <AyahSlider ayat={surahContent} initialAyahNumber={initialAyahNumber} />
       )}
     </main>
   );
