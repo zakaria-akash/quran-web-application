@@ -400,15 +400,13 @@ body {
     flex-direction: column;
   width: 100%;
   height: fit-content;
-    max-height: clamp(420px, 64vh, 680px);
   box-sizing: border-box;
   background: linear-gradient(160deg, rgba(8, 18, 30, 0.92) 0%, rgba(11, 30, 48, 0.92) 100%);
   border: 1px solid rgba(182, 204, 255, 0.24);
   border-radius: 16px;
   padding: 18px;
-  overflow-y: auto;
+  overflow-y: visible;
 }
-
 .ayah-slide>* {
   max-width: 100%;
 }
@@ -455,6 +453,118 @@ body {
   gap: 10px;
 }
 
+/* Jump control gives direct ayah access in a compact, professional toolbar pattern. */
+.ayah-slider-jump {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.ayah-slider-jump-label {
+  color: #c8d1e9;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.ayah-slider-jump-field {
+  position: relative;
+  min-width: 160px;
+}
+
+.ayah-slider-jump-input {
+  width: 100%;
+  min-width: 160px;
+  border: 1px solid rgba(159, 183, 255, 0.35);
+  border-radius: 10px;
+  background-color: rgba(12, 26, 44, 0.96);
+  color: #e7eeff;
+  padding: 8px 34px 8px 10px;
+  font: inherit;
+  text-align: left;
+  cursor: text;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23dbe6ff' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px 8px;
+}
+
+.ayah-slider-jump-input::placeholder {
+  color: #adc0ee;
+}
+
+.ayah-slider-jump-input:focus-visible {
+  outline: 2px solid #9fb7ff;
+  outline-offset: 2px;
+}
+
+.ayah-slider-jump-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 6;
+  max-height: 220px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid rgba(159, 183, 255, 0.35);
+  border-radius: 10px;
+  background: rgba(12, 26, 44, 0.98);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(159, 183, 255, 0.55) rgba(255, 255, 255, 0.08);
+}
+
+.ayah-slider-jump-menu::-webkit-scrollbar {
+  width: 10px;
+}
+
+.ayah-slider-jump-menu::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+.ayah-slider-jump-menu::-webkit-scrollbar-thumb {
+  background: rgba(159, 183, 255, 0.55);
+  border-radius: 999px;
+}
+
+.ayah-slider-jump-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(159, 183, 255, 0.75);
+}
+
+.ayah-slider-jump-option {
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #e7eeff;
+  padding: 8px 10px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ayah-slider-jump-option:hover,
+.ayah-slider-jump-option:focus-visible {
+  background: rgba(159, 183, 255, 0.22);
+  outline: 2px solid #9fb7ff;
+  outline-offset: 2px;
+}
+
+.ayah-slider-jump-option.is-selected {
+  background: rgba(159, 183, 255, 0.18);
+  color: #ffffff;
+}
+
+.ayah-slider-jump-empty {
+  padding: 8px 10px;
+  color: #c8d1e9;
+  font-size: 0.92rem;
+}
 /* Prev/next actions are compact and professional in the existing visual language. */
 .ayah-slider-button {
   border: 1px solid rgba(159, 183, 255, 0.4);
@@ -954,6 +1064,15 @@ body {
     grid-template-columns: 1fr;
   }
 
+    .surah-detail-header,
+    .surah-detail-title,
+    .surah-detail-meta {
+      text-align: center;
+    }
+  
+    .surah-detail-arabic-name {
+      text-align: center;
+    }
   .app-header-brand {
     justify-self: center;
       text-align: center;
@@ -980,11 +1099,17 @@ body {
   order: 3;
 }
 
+.ayah-slider-jump {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.ayah-slider-jump-field,
+.ayah-slider-jump-input {
+  width: 100%;
+  min-width: 0;
+}
 .ayah-slider-viewport {
   max-height: none;
-  }
-  
-  .ayah-slide {
-  max-height: clamp(380px, 62vh, 560px);
 }
 }
